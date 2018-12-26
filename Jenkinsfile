@@ -3,6 +3,9 @@ node('build-slave') {
     currentBuild.result = "SUCCESS"
     try {
        stage('Checkout'){
+          // Checking for pre-requisites
+          if (!env.hub_org)
+            error 'Please set a Jenkins environment variable named hub_org and value as sunbird'
           checkout scm
           // Getting commit short hash
           commit_hash = sh (
