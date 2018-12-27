@@ -5,7 +5,7 @@ commit_hash=$1
 name=player
 version=$2
 node=$3
-org=$4
+org=${4:-sunbird}
 
 docker build -f ./Dockerfile.Build --build-arg commit_hash=${commit_hash} -t ${org}/${name}:${version}-build . 
 docker run --name=${name}-${version}-build ${org}/${name}:${version}-build
