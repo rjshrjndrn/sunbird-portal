@@ -4,8 +4,8 @@ set -euo pipefail
 commit_hash=$1
 name=player
 version=$2
-node=$3
-org=${4:-sunbird}
+org=${3:-sunbird} # Docker tag organization name; eg: sunbird/player:latest
+node=${4:-master} # Create metadata json with node name
 
 docker build -f ./Dockerfile.Build --build-arg commit_hash=${commit_hash} -t ${org}/${name}:${version}-build . 
 docker run --name=${name}-${version}-build ${org}/${name}:${version}-build
