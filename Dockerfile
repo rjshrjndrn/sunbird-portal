@@ -13,3 +13,4 @@ WORKDIR /home/sunbird/app_dist
 EXPOSE 3000
 CMD ["node", "server.js", "&"]
 
+RUN 
