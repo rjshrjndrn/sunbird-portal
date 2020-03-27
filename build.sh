@@ -19,16 +19,20 @@ echo "entering to node container"
 # if you want to clear the cache simply delete the volume
 # `docker volume rm node12`
 # Running the docker command with less priority as build takes time, don't want to choke other processes.
-docker run --rm -v node12_npm_cache:/var/lib/jenkins/.npm/ -v /etc/passwd:/etc/passwd -u `id -u`:`id -g` -v `pwd`:`pwd` circleci/node:12 echo "node version: "; \
-node -v ; \
-echo "npm version: "; \
-npm -v ; \
-npm set progress=false ; \
-nice npm install  --unsafe-perm ; \
-nice npm run deploy ; \
-cd app_dist ; \
-nice npm install --production  --unsafe-perm ; \
-sed -i "/version/a\  \"buildHash\": \"${commit_hash}\"," package.json ; \
+cat<< EOF > buildscript.sh
+whoami
+node -v
+npm -v
+npm set progress=false
+nice npm install  --unsafe-perm
+nice npm run deploy
+cd app_dist
+nice npm install --production  --unsafe-perm
+sed -i "/version/a\  \"buildHash\": \"${commit_hash}\"," package.json
+EOF
+
+docker run --rm -v /tmp/buildscript.sh:/tmp/buildscript.sh -v node12_npm_cache:/var/lib/jenkins/.npm/ -v /etc/passwd:/etc/passwd -u `id -u`:`id -g` -v `pwd`:`pwd` -v$(pwd):/var/lib/jenkins/player -w /var/lib/jenkins/player circleci/node:12 /bin/bash buildscript.sh
+
 cd ../..
 
 docker build --no-cache --label commitHash=$(git rev-parse --short HEAD) -t ${org}/${name}:${build_tag} .
